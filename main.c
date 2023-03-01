@@ -6,7 +6,7 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 16:43:23 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/02/28 20:06:49 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/01 16:37:42 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,19 +23,18 @@ void	*dine(void *context)
 		{
 			pthread_mutex_unlock(&philo->mutex);
 			pthread_mutex_unlock(philo->lmutex);
+			philo->args->e_philos++;
 			return (NULL);
 		}
 		p_eat(philo);
 		p_sleep(philo);
 		p_think_or_die(philo);
-		if (philo->args->nt_eat > 0)
+		if (philo->full == true)
 		{
-			if (philo->t_eaten >= philo->args->nt_eat)
-			{
-				pthread_mutex_unlock(&philo->mutex);
-				pthread_mutex_unlock(philo->lmutex);
-				return (NULL);
-			}
+			pthread_mutex_unlock(&philo->mutex);
+			pthread_mutex_unlock(philo->lmutex);
+			philo->args->e_philos++;
+			return (NULL);
 		}
 	}
 	return (NULL);
@@ -46,6 +45,8 @@ void	load_env_data(t_args *args, t_philo **philo)
 	int	i;
 
 	i = -1;
+	args->kill_all = false;
+	args->e_philos = 0;
 	while (++i < args->n_philos)
 		pthread_mutex_init(&philo[i]->mutex, NULL);
 	i = -1;
@@ -55,12 +56,12 @@ void	load_env_data(t_args *args, t_philo **philo)
 	while (++i < args->n_philos)
 	{
 		philo[i]->id = i + 1;
-		philo[i]->t_eaten = 0;
-		philo[i]->lt_eaten = 0;
 		philo[i]->args = args;
+		philo[i]->full = false;
 		pthread_create(&philo[i]->thread, NULL, &dine, philo[i]);
 		usleep(1000);
 	}
+	monitor_philosophers(args, philo);
 	i = -1;
 	while (++i < args->n_philos)
 		pthread_join(philo[i]->thread, NULL);
@@ -89,10 +90,10 @@ void	load_philosopher_data(t_args *args)
 		}
 	}
 	args->kill_all = false;
+	args->test_value = 0;
 	load_env_data(args, philo);
 	return ;
 }
-
 
 void	initialize_data(t_args *args, char **av)
 {

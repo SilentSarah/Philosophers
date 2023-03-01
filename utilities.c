@@ -6,12 +6,11 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 17:00:31 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/02/28 19:09:05 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/01 17:03:15 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Philosophers.h"
-
 
 static int	spaces(const char *str)
 {
@@ -54,4 +53,18 @@ void	gettime(t_args *args)
 	gettimeofday(&args->time, NULL);
 	args->ts_ms = ((long long)args->time.tv_sec * 1000)
 		+ ((long long)args->time.tv_usec / 1000);
+}
+
+void	end_simulation(t_args *args, t_philo **philo)
+{
+	int	i;
+
+	i = -1;
+	while (++i < args->n_philos)
+	{
+		if (philo[i])
+			free(philo[i]);
+	}
+	if (philo)
+		free (philo);
 }
