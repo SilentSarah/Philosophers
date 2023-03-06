@@ -6,7 +6,7 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 17:00:31 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/01 17:03:15 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/06 19:53:19 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,16 +55,33 @@ void	gettime(t_args *args)
 		+ ((long long)args->time.tv_usec / 1000);
 }
 
+void	paction(int type, int id, t_args *args, t_philo *philo)
+{
+	pthread_mutex_lock(&args->message);
+	gettime(args);
+	if (type == pick_fork)
+		printf("%lld %d has taken a fork\n",
+			args->ts_ms - philo->f_eaten, id);
+	else if (type == eat)
+		printf("%lld %d is eating\n",
+			args->ts_ms - philo->f_eaten, id);
+	else if (type == sleeping)
+		printf("%lld %d is sleeping\n",
+			args->ts_ms - philo->f_eaten, id);
+	else if (type == think)
+		printf("%lld %d is thinking\n",
+			args->ts_ms - philo->f_eaten, id);
+	else if (type == die)
+		printf("%lld %d died\n",
+			args->ts_ms - philo->f_eaten, id);
+	pthread_mutex_unlock(&args->message);
+}
+
 void	end_simulation(t_args *args, t_philo **philo)
 {
 	int	i;
 
 	i = -1;
 	while (++i < args->n_philos)
-	{
-		if (philo[i])
-			free(philo[i]);
-	}
-	if (philo)
-		free (philo);
+		free(philo[i]);
 }

@@ -6,7 +6,7 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 16:43:23 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/01 16:37:42 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/06 20:04:51 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void	load_env_data(t_args *args, t_philo **philo)
 	args->e_philos = 0;
 	while (++i < args->n_philos)
 		pthread_mutex_init(&philo[i]->mutex, NULL);
+	pthread_mutex_init(&args->message, NULL);
 	i = -1;
 	while (++i < args->n_philos)
 		philo[i]->lmutex = &philo[(i + 1) % args->n_philos]->mutex;
