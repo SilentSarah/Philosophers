@@ -6,7 +6,7 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 11:56:40 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/06 20:07:52 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/09 20:30:40 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,15 @@
 
 bool	check_last_time_eaten(t_philo *philo, t_args *args)
 {
-	int	success;
+	long long	ts_ms;
 
-	success = 0;
-	gettime(args);
-	if (args->ts_ms - philo->lt_eaten >= args->t_die)
+	ts_ms = rettime();
+	if (ts_ms - philo->lt_eaten >= args->t_die)
 	{
 		paction(die, philo->id, args, philo);
-		success = pthread_mutex_unlock(&philo->mutex);
-		success = pthread_mutex_unlock(philo->lmutex);
-		pthread_detach(philo->thread);
-		args->kill_all = true;
+		return (true);
 	}
-	return (args->kill_all);
+	return (false);
 }
 
 void	monitor_philosophers(t_args *args, t_philo **philo)
@@ -43,8 +39,15 @@ void	monitor_philosophers(t_args *args, t_philo **philo)
 		i = -1;
 		while (++i < args->n_philos)
 		{
+			pthread_mutex_lock(&args->status);
 			if (check_last_time_eaten(philo[i], args) == true)
+			{
 				args->e_philos = args->n_philos;
+				args->kill_all = true;
+			}
+			pthread_mutex_unlock(&args->status);
 		}
 	}
 }
+
+// I NEED TO WORK ON THE FUCKING DATA RACE

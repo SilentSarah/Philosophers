@@ -6,7 +6,7 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 16:24:00 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/06 19:53:00 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/09 20:26:30 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ struct s_args {
 	bool			kill_all;
 	struct timeval	time;
 	pthread_mutex_t	message;
+	pthread_mutex_t	status;
+	pthread_mutex_t	clock;
 	int				e_philos;
 	int				test_value;
 };
@@ -62,12 +64,18 @@ enum e_actions {
 	die,
 };
 
-int		_atoi(const char *str);
-void	gettime(t_args *args);
-void	p_eat(t_philo *philo);
-void	p_sleep(t_philo *philo);
-void	p_think_or_die(t_philo *philo);
-void	monitor_philosophers(t_args *args, t_philo **philo);
-void	end_simulation(t_args *args, t_philo **philo);
-void	paction(int type, int id, t_args *args, t_philo *philo);
+int			_atoi(const char *str);
+long long	gettime(t_args *args);
+void		p_eat(t_philo *philo);
+void		p_sleep(t_philo *philo);
+void		monitor_philosophers(t_args *args, t_philo **philo);
+void		end_simulation(t_args *args, t_philo **philo);
+void		paction(int type, int id, t_args *args, t_philo *philo);
+void		*dine(void *context);
+void		load_env_data(t_args *args, t_philo **philo);
+void		load_philosopher_data(t_args *args);
+void		initialize_data(t_args *args, char **av);
+bool		check_philosopher_status(t_philo *philo);
+void		msleep(uint32_t mili_sec);
+long long	rettime(void);
 #endif

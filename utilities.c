@@ -6,7 +6,7 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 17:00:31 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/06 19:53:19 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/09 20:25:41 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,14 @@ int	_atoi(const char *str)
 	return (res * neg);
 }
 
-void	gettime(t_args *args)
+long long	gettime(t_args *args)
 {
+	// pthread_mutex_lock(&args->clock);
 	gettimeofday(&args->time, NULL);
 	args->ts_ms = ((long long)args->time.tv_sec * 1000)
 		+ ((long long)args->time.tv_usec / 1000);
+	// pthread_mutex_unlock(&args->clock);
+	return (args->ts_ms);
 }
 
 void	paction(int type, int id, t_args *args, t_philo *philo)
@@ -84,4 +87,5 @@ void	end_simulation(t_args *args, t_philo **philo)
 	i = -1;
 	while (++i < args->n_philos)
 		free(philo[i]);
+	free (philo);
 }
