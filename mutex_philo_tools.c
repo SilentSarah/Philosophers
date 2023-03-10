@@ -6,7 +6,7 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 13:02:46 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/10 15:50:11 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/10 20:02:12 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ void	load_philosophers(t_args *args, t_philo **philo)
 	while (++i < args->n_philos)
 	{
 		pthread_create(&philo[i]->thread, NULL, &dine, philo[i]);
+		pthread_detach(philo[i]->thread);
 		msleep(1);
 	}
 }
