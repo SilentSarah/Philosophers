@@ -6,7 +6,7 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 17:00:31 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/09 20:25:41 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/10 13:19:30 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,35 +48,24 @@ int	_atoi(const char *str)
 	return (res * neg);
 }
 
-long long	gettime(t_args *args)
-{
-	// pthread_mutex_lock(&args->clock);
-	gettimeofday(&args->time, NULL);
-	args->ts_ms = ((long long)args->time.tv_sec * 1000)
-		+ ((long long)args->time.tv_usec / 1000);
-	// pthread_mutex_unlock(&args->clock);
-	return (args->ts_ms);
-}
-
 void	paction(int type, int id, t_args *args, t_philo *philo)
 {
 	pthread_mutex_lock(&args->message);
-	gettime(args);
 	if (type == pick_fork)
 		printf("%lld %d has taken a fork\n",
-			args->ts_ms - philo->f_eaten, id);
+			gettime() - philo->f_eaten, id);
 	else if (type == eat)
 		printf("%lld %d is eating\n",
-			args->ts_ms - philo->f_eaten, id);
+			gettime() - philo->f_eaten, id);
 	else if (type == sleeping)
 		printf("%lld %d is sleeping\n",
-			args->ts_ms - philo->f_eaten, id);
+			gettime() - philo->f_eaten, id);
 	else if (type == think)
 		printf("%lld %d is thinking\n",
-			args->ts_ms - philo->f_eaten, id);
+			gettime() - philo->f_eaten, id);
 	else if (type == die)
 		printf("%lld %d died\n",
-			args->ts_ms - philo->f_eaten, id);
+			gettime() - philo->f_eaten, id);
 	pthread_mutex_unlock(&args->message);
 }
 

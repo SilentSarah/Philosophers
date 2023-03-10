@@ -1,31 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   utilities_2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/10 12:45:33 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/10 15:31:07 by hmeftah          ###   ########.fr       */
+/*   Created: 2023/03/10 13:11:30 by hmeftah           #+#    #+#             */
+/*   Updated: 2023/03/10 13:36:19 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Philosophers.h"
 
-int	main(int ac, char **av)
+long long	gettime(void)
 {
-	t_args	args;
-	t_philo	**philo;
+	struct timeval	time;
 
-	if (ac < 5 || ac > 6)
+	gettimeofday(&time, NULL);
+	return (((long long)time.tv_sec * 1000 + (long long)time.tv_usec / 1000));
+}
+
+void	msleep(uint32_t milisec)
+{
+	long long	start;
+
+	start = gettime();
+	while (1)
 	{
-		printf(GUIDE);
-		return (0);
+		usleep(100);
+		if (gettime() - start >= milisec)
+			return ;
 	}
-	if (!load_arguments(&args, av))
-		return (1);
-	philo = allocate_memory(&args);
-	if (!philo)
-		return (1);
-	load_environment(&args, philo);
+	return ;
 }

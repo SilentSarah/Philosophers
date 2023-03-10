@@ -1,34 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   dine_support.c                                     :+:      :+:    :+:   */
+/*   dine_tools.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/09 19:27:38 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/09 19:30:27 by hmeftah          ###   ########.fr       */
+/*   Created: 2023/03/10 14:22:54 by hmeftah           #+#    #+#             */
+/*   Updated: 2023/03/10 19:33:39 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Philosophers.h"
 
-bool	check_philosopher_status(t_philo *philo)
+void	imprint_philosopher_data(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->args->status);
-	if (philo->args->kill_all == true)
+	philo->lt_eaten = gettime();
+	philo->t_eaten += 1;
+	if (philo->args->nt_eat > 0)
 	{
-		pthread_mutex_unlock(&philo->mutex);
-		pthread_mutex_unlock(philo->lmutex);
-		philo->args->e_philos++;
-		return (true);
-	}
-	if (philo->full == true)
-	{
-		pthread_mutex_unlock(&philo->mutex);
-		pthread_mutex_unlock(philo->lmutex);
-		philo->args->e_philos++;
-		return (true);
+		philo->args->fuel -= 1;
+		if (philo->args->fuel == 0)
+			philo->args->everyone_ate = true;
 	}
 	pthread_mutex_unlock(&philo->args->status);
-	return (false);
 }

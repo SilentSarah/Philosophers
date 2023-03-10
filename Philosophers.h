@@ -6,7 +6,7 @@
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 16:24:00 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/09 20:26:30 by hmeftah          ###   ########.fr       */
+/*   Updated: 2023/03/10 19:50:59 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,14 @@ struct s_args {
 	int				t_eat;
 	int				t_sleep;
 	int				nt_eat;
-	long long		ts_ms;
+	int				fuel;
+	bool			everyone_ate;
 	bool			kill_all;
 	struct timeval	time;
 	pthread_mutex_t	message;
 	pthread_mutex_t	status;
 	pthread_mutex_t	clock;
 	int				e_philos;
-	int				test_value;
 };
 typedef struct s_args	t_args;
 
@@ -65,17 +65,20 @@ enum e_actions {
 };
 
 int			_atoi(const char *str);
-long long	gettime(t_args *args);
-void		p_eat(t_philo *philo);
-void		p_sleep(t_philo *philo);
-void		monitor_philosophers(t_args *args, t_philo **philo);
+long long	gettime(void);
+void		msleep(uint32_t milisec);
 void		end_simulation(t_args *args, t_philo **philo);
 void		paction(int type, int id, t_args *args, t_philo *philo);
+bool		load_arguments(t_args *args, char **av);
+t_philo		**allocate_memory(t_args *args);
+void		load_environment(t_args *args, t_philo **philo);
+void		load_mutexes(t_args *args, t_philo **philo);
+void		load_philosophers(t_args *args, t_philo **philo);
+void		run_monitor(t_args *args, t_philo **philo);
 void		*dine(void *context);
-void		load_env_data(t_args *args, t_philo **philo);
-void		load_philosopher_data(t_args *args);
-void		initialize_data(t_args *args, char **av);
-bool		check_philosopher_status(t_philo *philo);
-void		msleep(uint32_t mili_sec);
-long long	rettime(void);
+bool		is_it_full(t_args *args, t_philo *philo);
+bool		should_it_die(t_args *args, t_philo *philo);
+void		imprint_philosopher_data(t_philo *philo);
+bool		check_if_all_philosophers_died(t_args *args);
+bool		check_if_all_philosophers_ate_enough(t_args *args);
 #endif

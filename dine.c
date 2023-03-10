@@ -5,45 +5,20 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/28 17:43:11 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/09 20:19:39 by hmeftah          ###   ########.fr       */
+/*   Created: 2023/03/10 13:37:44 by hmeftah           #+#    #+#             */
+/*   Updated: 2023/03/10 19:51:42 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Philosophers.h"
 
-// void	p_eat(t_philo *philo)
-// {
-// 	if (philo->lt_eaten == 0)
-// 	{
-// 		gettime(philo->args);
-// 		philo->f_eaten = philo->args->ts_ms;
-// 		philo->lt_eaten = philo->args->ts_ms;
-// 	}
-// 	if (philo->full == true || philo->args->kill_all == true)
-// 		return ;
-// 	philo->lt_eaten = philo->args->ts_ms;
-// 	if (!pthread_mutex_lock(&philo->mutex) && philo->args->kill_all == false)
-// 		paction(pick_fork, philo->id, philo->args, philo);
-// 	if (!pthread_mutex_lock(philo->lmutex) && philo->args->kill_all == false)
-// 	{
-// 		paction(pick_fork, philo->id, philo->args, philo);
-// 		paction(eat, philo->id, philo->args, philo);
-// 		philo->args->test_value += 1;
-// 		usleep(philo->args->t_eat * 1000);
-// 		gettime(philo->args);
-// 		philo->lt_eaten = philo->args->ts_ms;
-// 		philo->t_eaten++;
-// 	}
-// }
-
-void	p_eat(t_philo *philo)
+static void	philo_eat(t_philo *philo)
 {
-	if (philo->full == true || philo->args->kill_all == true)
+	if (is_it_full(philo->args, philo))
 		return ;
 	pthread_mutex_lock(&philo->mutex);
 	paction(pick_fork, philo->id, philo->args, philo);
-	if (philo->args->kill_all == true)
+	if (should_it_die(philo->args, philo))
 	{
 		pthread_mutex_unlock(&philo->mutex);
 		return ;
@@ -52,31 +27,19 @@ void	p_eat(t_philo *philo)
 	paction(pick_fork, philo->id, philo->args, philo);
 	paction(eat, philo->id, philo->args, philo);
 	msleep(philo->args->t_eat);
-	philo->lt_eaten = gettime(philo->args);
-	philo->t_eaten++;
-	if (philo->args->kill_all == true)
-	{
-		pthread_mutex_unlock(&philo->mutex);
-		return ;
-	}
+	imprint_philosopher_data(philo);
 }
 
-void	p_sleep(t_philo *philo)
+static void	philo_sleep(t_philo *philo)
 {
-	if (philo->args->kill_all == false)
-	{
-		pthread_mutex_unlock(&philo->mutex);
-		pthread_mutex_unlock(philo->lmutex);
-		paction(sleeping, philo->id, philo->args, philo);
-		msleep(philo->args->t_sleep);
-		if (philo->args->nt_eat > 0
-			&& philo->t_eaten >= philo->args->nt_eat)
-		{	
-			philo->args->e_philos += 1;
-			philo->full = true;
-			return ;
-		}
-	}
+	pthread_mutex_unlock(&philo->mutex);
+	pthread_mutex_unlock(philo->lmutex);
+	paction(sleeping, philo->id, philo->args, philo);
+	msleep(philo->args->t_eat);
+}
+
+static void	philo_think(t_philo *philo)
+{
 	paction(think, philo->id, philo->args, philo);
 }
 
@@ -87,10 +50,11 @@ void	*dine(void *context)
 	philo = (t_philo *)context;
 	while (1)
 	{
-		if (check_philosopher_status(philo) == true)
+		if (is_it_full(philo->args, philo)
+			|| check_if_all_philosophers_died(philo->args))
 			return (NULL);
-		p_eat(philo);
-		p_sleep(philo);
+		philo_eat(philo);
+		philo_sleep(philo);
+		philo_think(philo);
 	}
-	return (NULL);
 }

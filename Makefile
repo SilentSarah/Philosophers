@@ -6,7 +6,7 @@
 #    By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/28 16:43:35 by hmeftah           #+#    #+#              #
-#    Updated: 2023/03/09 20:24:41 by hmeftah          ###   ########.fr        #
+#    Updated: 2023/03/10 19:40:06 by hmeftah          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = philo
 CC = cc
 FLAGS = -Wall -Werror -Wextra
 INCLUDE = -I Philosophers.h
-SRC = utilities.c dine.c monitor.c mutex_tools.c tools.c dine_support.c
+SRC = dine.c dine_tools.c load_data.c monitor.c mutex_philo_tools.c utilities.c utilities_2.c
 MAIN = main.c
 PTHREAD = -pthread -fsanitize=thread -g
 

@@ -5,49 +5,100 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmeftah <hmeftah@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/01 11:56:40 by hmeftah           #+#    #+#             */
-/*   Updated: 2023/03/09 20:30:40 by hmeftah          ###   ########.fr       */
+/*   Created: 2023/03/10 13:21:12 by hmeftah           #+#    #+#             */
+/*   Updated: 2023/03/10 19:54:04 by hmeftah          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Philosophers.h"
 
-bool	check_last_time_eaten(t_philo *philo, t_args *args)
+bool	should_it_die(t_args *args, t_philo *philo)
 {
-	long long	ts_ms;
-
-	ts_ms = rettime();
-	if (ts_ms - philo->lt_eaten >= args->t_die)
+	pthread_mutex_lock(&args->status);
+	if (gettime() - philo->lt_eaten >= args->t_die)
 	{
-		paction(die, philo->id, args, philo);
+		if (args->nt_eat > 0)
+		{
+			if (philo->t_eaten >= args->nt_eat)
+			{
+				pthread_mutex_unlock(&args->status);
+				return (false);
+			}
+		}
+		args->kill_all = true;
+		args->e_philos = 0;
+		pthread_mutex_unlock(&args->status);
 		return (true);
 	}
+	pthread_mutex_unlock(&args->status);
 	return (false);
 }
 
-void	monitor_philosophers(t_args *args, t_philo **philo)
+bool	is_it_full(t_args *args, t_philo *philo)
 {
-	int					i;
+	pthread_mutex_lock(&args->status);
+	if (args->nt_eat > 0)
+	{
+		if (philo->t_eaten >= args->nt_eat)
+		{
+			pthread_mutex_unlock(&args->status);
+			return (true);
+		}
+	}
+	pthread_mutex_unlock(&args->status);
+	return (false);
+}
+
+bool	check_if_all_philosophers_died(t_args *args)
+{
+	pthread_mutex_lock(&args->status);
+	if (args->kill_all == true)
+	{
+		pthread_mutex_unlock(&args->status);
+		return (true);
+	}
+	pthread_mutex_unlock(&args->status);
+	return (false);
+}
+
+bool	check_if_all_philosophers_ate_enough(t_args *args)
+{
+	pthread_mutex_lock(&args->status);
+	if (args->nt_eat > 0)
+	{
+		if (args->everyone_ate == true)
+		{
+			pthread_mutex_unlock(&args->status);
+			return (true);
+		}
+	}
+	pthread_mutex_unlock(&args->status);
+	return (false);
+}
+
+void	run_monitor(t_args *args, t_philo **philo)
+{
+	int	i;
 
 	while (1)
 	{
-		if (args->e_philos >= args->n_philos)
+		i = -1;
+		if (check_if_all_philosophers_died(args)
+			|| check_if_all_philosophers_ate_enough(args))
 		{
 			end_simulation(args, philo);
 			return ;
 		}
-		i = -1;
 		while (++i < args->n_philos)
 		{
-			pthread_mutex_lock(&args->status);
-			if (check_last_time_eaten(philo[i], args) == true)
+			if (should_it_die(args, philo[i]))
+				paction(die, philo[i]->id, args, philo[i]);
+			if (is_it_full(args, philo[i]))
 			{
-				args->e_philos = args->n_philos;
-				args->kill_all = true;
+				pthread_mutex_lock(&args->status);
+				philo[i]->full = true;
+				pthread_mutex_unlock(&args->status);
 			}
-			pthread_mutex_unlock(&args->status);
 		}
 	}
 }
-
-// I NEED TO WORK ON THE FUCKING DATA RACE
