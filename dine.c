@@ -26,7 +26,7 @@ static void	philo_eat(t_philo *philo)
 	pthread_mutex_lock(philo->lmutex);
 	paction(pick_fork, philo->id, philo->args, philo);
 	paction(eat, philo->id, philo->args, philo);
-	msleep(philo->args->t_eat);
+	msleep(philo->args->t_sleep);
 	imprint_philosopher_data(philo);
 }
 
