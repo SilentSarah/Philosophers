@@ -26,7 +26,7 @@ static void	philo_eat(t_philo *philo)
 	pthread_mutex_lock(philo->lmutex);
 	paction(pick_fork, philo->id, philo->args, philo);
 	paction(eat, philo->id, philo->args, philo);
-	msleep(philo->args->t_sleep);
+	msleep(philo->args->t_eat);
 	imprint_philosopher_data(philo);
 }
 
@@ -35,7 +35,7 @@ static void	philo_sleep(t_philo *philo)
 	pthread_mutex_unlock(&philo->mutex);
 	pthread_mutex_unlock(philo->lmutex);
 	paction(sleeping, philo->id, philo->args, philo);
-	msleep(philo->args->t_eat);
+	msleep(philo->args->t_sleep);
 }
 
 static void	philo_think(t_philo *philo)
